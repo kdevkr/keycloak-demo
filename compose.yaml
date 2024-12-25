@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  keycloak_web:
+    image: quay.io/keycloak/keycloak:26.0.6
+    container_name: keycloak_web
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_HTTP_ENABLED: true
+      KC_HTTPS_ENABLED: false
+      KC_PROXY: edge
+
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      # Configuration TLS
+      # KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/data/certs/cert.pem
+      # KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/data/certs/key.pem
+      # KC_HTTPS_CERTIFICATE_CHAIN: /opt/keycloak/data/certs/chain.pem
+
+    command: start
+    depends_on:
+      - keycloak_db
+    ports:
+      - "8888:8080"
+
+  keycloak_db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+
+volumes:
+  postgres_data:
